@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  slurp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    entrypoint: php /app/entrypoint/slurp.php
+    restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 1
