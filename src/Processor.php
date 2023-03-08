@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Vatradar\Slurp;
+namespace VatRadar\Slurp;
 
 use Bunny\Channel;
 use DateTimeImmutable;
@@ -10,7 +10,7 @@ use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use Throwable;
-use Vatradar\Vatsimclient\Client;
+use VatRadar\VatsimClient\Client;
 
 class Processor
 {
@@ -44,7 +44,7 @@ class Processor
             try {
                 $data = $this->vatsim->retrieve();
             } catch (Throwable) {
-                $deferred->reject("Retrieval failure");
+                $deferred->reject('Retrieval failure');
                 return;
             }
 
@@ -70,7 +70,7 @@ class Processor
             try {
                 $this->mq->publish(serialize($data), [], 'vatsim.input');
             } catch (Throwable) {
-                $deferred->reject("Exchange Push Failure");
+                $deferred->reject('Exchange Push Failure');
             }
 
             $deferred->resolve(true);

@@ -3,17 +3,20 @@
 declare(strict_types=1);
 
 use Bunny\Client as BunnyClient;
-use Dotenv\Dotenv;
+use CuyZ\Valinor\MapperBuilder;
 use GuzzleHttp\Client as GuzzleClient;
 use React\EventLoop\Loop;
-use Vatradar\Slurp\Env;
-use Vatradar\Slurp\Processor;
-use Vatradar\Vatsimclient\Client as VatsimClient;
+use Vatradar\Dataobjects\Vatsim\VatsimData;
+use VatRadar\Env\Env;
+use VatRadar\Slurp\Processor;
+use VatRadar\VatsimClient\Client as VatsimClient;
+use VatRadar\VatsimClient\DataFetcher;
+use VatRadar\VatsimClient\IterableSanitizer;
+use VatRadar\VatsimClient\Mapper;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$env = Dotenv::createImmutable(__DIR__ . '/../');
-$env->safeLoad();
+Env::init(__DIR__.'/../');
 $loop = Loop::get();
 
 function memoryUsage(): void
@@ -26,8 +29,9 @@ function memoryUsage(): void
 }
 
 try {
-    $vatsim = new VatsimClient(new GuzzleClient(), ['bootUri' => Env::get('SLURP_BOOTURI')]);
-    $vatsim->bootstrap();
+    $fetcher = new DataFetcher(new GuzzleClient(), Env::get('SLURP_BOOTURI'));
+    $mapper = new Mapper(new MapperBuilder(), VatsimData::class);
+    $vatsim = new VatsimClient($fetcher, new IterableSanitizer(), $mapper);
 
     $bunny = (new BunnyClient([
         'host' => Env::get('RB_HOST'),
@@ -37,20 +41,27 @@ try {
     ]))->connect();
     $channel = $bunny->channel();
 
-    $slurp = new Processor($loop, $vatsim, $channel);
 } catch (Throwable $e) {
     echo $e->getMessage() . PHP_EOL;
     // just restart the container
     exit(1);
 }
 
+function slurp(): void
+{
+    global $loop, $channel, $vatsim;
+    $slurp = new Processor($loop, $vatsim, $channel);
+    $slurp->run();
+    unset($slurp);
+}
+
 // run now
-$slurp->run();
+slurp();
 memoryUsage();
 
 // set up future runs
-$loop->addPeriodicTimer(Env::get('SLURP_TIMER'), function () use ($slurp) {
-    $slurp->run();
+$loop->addPeriodicTimer(Env::get('SLURP_TIMER'), function () {
+    slurp();
 });
 
 // memory usage
