@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace VatRadar\Slurp;
+namespace Slurp;
 
 use Bunny\Channel;
 use DateTimeImmutable;
