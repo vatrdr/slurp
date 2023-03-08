@@ -25,6 +25,11 @@
         "phpunit/phpunit": "^10.0",
         "spaze/phpstan-disallowed-calls": "^2.11"
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Slurp": "tests/"
+        }
+    },
     "require": {
         "php": "^8.1",
         "ext-json": "*",
