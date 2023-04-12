@@ -34,9 +34,9 @@
         "bunny/bunny": "^0.5",
         "react/event-loop": "^1.3",
         "react/promise": "^2.9",
-        "vatradar/dataobjects": "^0.7",
-        "vatradar/env": "^0.7",
-        "vatradar/vatsimclient": "^0.7"
+        "vatradar/dataobjects": "^0.6",
+        "vatradar/env": "^0.6",
+        "vatradar/vatsimclient": "^0.6"
     },
     "config": {
         "bin-dir": "vbin",
@@ -47,7 +47,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "0.7-dev"
+            "dev-main": "0.6-dev"
         }
     },
     "repositories": [
